@@ -1,4 +1,7 @@
 /// <reference types="cypress" />
+import infoCliente from "../support/page_objects/cliente.page"
+const dadosCliente = require('../fixtures/client.json')
+var faker = require('faker')
 
 context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
     /*  Como cliente 
@@ -16,35 +19,38 @@ context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
 
     it('Deve fazer um pedido na loja Ebac Shop de ponta a ponta', () => {
 
-        // Acesso a pagina e Login
+        // Acesso a pagina e Registro de Usuario
 
-        cy.get('.icon-user-unfollow').click()
-        cy.get('#username').type('aluno_ebac@teste.com')
-        cy.get('#password').type('teste@teste.com', { log: false })
-        cy.get('.woocommerce-form > .button').click()
+        let nomeFaker = faker.name.firstName()
+        let sobrenomeFaker = faker.name.lastName()
+        let emailFaker = faker.internet.email()
+
+       cy.loginFaker(emailFaker)
 
         // Acesso a pagina de produtos
 
         cy.get('#primary-menu > .menu-item-629 > a').click()
 
-        // Selecao de produtos
+        // Selecao de produtos com comando customizado      
 
         // Produto 1: Abominable Hoodie
 
-        cy.get('.post-2559 > .product-block > .block-inner > .image > .product-image > .image-hover').click()
-        cy.get('.button-variable-item-L').click()
-        cy.get('.button-variable-item-Red').click()
-        cy.get('.input-text').clear().type('2')
-        cy.get('.single_add_to_cart_button').click()
+        cy.addProdutos('Abominable Hoodie', 'XS', 'Green', 1)
 
         // Produto 2: Argus All-Weather Tank
 
         cy.visit('produtos')
-        cy.get('.post-3647 > .product-block > .block-inner > .image > .product-image > .image-hover').click()
-        cy.get('.button-variable-item-XS').click()
-        cy.get(':nth-child(2) > .value > .variable-items-wrapper > .variable-item').click()
-        cy.get('.input-text').clear().type('2')
-        cy.get('.single_add_to_cart_button').click()
+        cy.addProdutos('Argus All-Weather Tank', 'XS', 'Gray', 1)
+
+        // Produto 3: Arcadio Gym Short
+
+        cy.visit('produtos')
+        cy.addProdutos('Arcadio Gym Short', '34', 'Blue', 1)
+
+        // Produto 4: Argus All-Weather Tank
+
+        cy.visit('produtos')
+        cy.addProdutos('Argus All-Weather Tank', 'S', 'Gray', 1)
 
         // Verificacao do carrinho e confirmacao da compra
 
@@ -55,19 +61,22 @@ context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
         // Dados do cliente
 
         cy.visit('checkout')
-        cy.get('#billing_first_name').clear().type('Charlinho')
-        cy.get('#billing_last_name').clear().type('Menezes')
-        cy.get('#billing_company').clear().type('MTV')
-        cy.get('#select2-billing_country-container').click().type('Brasil').get('[aria-selected="true"]').click()
-        cy.get('#billing_address_1').clear().type('Rua dos Bobos')
-        cy.get('#billing_address_2').clear().type('0')
-        cy.get('#billing_city').clear().type('Jarangonhonha')
-        cy.get('#select2-billing_state-container').click().type('Minas Gerais' + '{enter}')
-        cy.get('#billing_postcode').clear().type('89000000')
-        cy.get('#billing_phone').clear().type('3169587870')
-        cy.get('#billing_email').clear().type('charlinho@batata.com.br')
 
-        // Finalizacao da compra
+        infoCliente.editarCheckoutCliente(
+            dadosCliente[2].nome,
+            dadosCliente[2].sobrenome, 
+            dadosCliente[2].empresa,
+            dadosCliente[2].pais,
+            dadosCliente[2].endereco,
+            dadosCliente[2].numero,
+            dadosCliente[2].cidade,
+            dadosCliente[2].estado,
+            dadosCliente[2].cep,
+            dadosCliente[2].telefone,
+            dadosCliente[2].email
+            )
+
+         // Finalizacao da compra
 
         cy.get('#payment_method_cod').click()
         cy.get('#terms').click()
@@ -89,6 +98,4 @@ context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
 
 
     });
-
-
 })

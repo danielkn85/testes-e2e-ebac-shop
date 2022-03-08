@@ -25,6 +25,7 @@
     "cypress": "^8.2.0"
   },
   "dependencies": {
+    "@faker-js/faker": "^6.0.0-beta.0",
     "faker": "^5.5.3"
   }
 }
